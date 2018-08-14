@@ -17,7 +17,7 @@ class LeaderBoard
 
     public function writeGroups(): bool
     {
-        $this->kitGroup = new Group(1, new Type(Type::KIT));
+        $this->kitGroup = new Group($this->mongo->getNextGroupId(), new Type(Type::KIT));
 
         return $this->mongo->saveGroup($this->kitGroup);
     }
