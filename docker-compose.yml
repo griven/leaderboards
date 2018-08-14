@@ -1,0 +1,24 @@
+version: "3"
+
+services:
+
+  php-fpm:
+    image: php_plus_mongo:latest
+    volumes:
+      - ./:/var/scm
+    networks:
+      backend:
+        aliases:
+          - php-fpm
+
+  mongo:
+    image: mongo:3.4.10-jessie
+    ports:
+      - 27017:27017
+    volumes:
+      - ./runtime/mongo:/data/db
+    networks:
+      - backend
+
+networks:
+  backend:
