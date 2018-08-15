@@ -3,8 +3,6 @@ declare(strict_types=1);
 
 namespace LeaderBoard;
 
-use MongoDB\Model\BSONArray;
-
 class MongoStorage
 {
 

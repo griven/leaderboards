@@ -27,7 +27,7 @@ class Group implements IArrayTransform
         $this->type = $type;
         $this->setCounts();
 
-        if ($membersCollection > self::MAX_SIZE) {
+        if ($membersCollection->getCount() > self::MAX_SIZE) {
             throw new \InvalidArgumentException('too much members');
         }
 

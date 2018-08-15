@@ -39,6 +39,31 @@ class LeaderBoard
         }
     }
 
+    public function getGroups(): array
+    {
+        return $this->groups;
+    }
+
+    public static function groupToIntForSort(Group $group)
+    {
+        switch ($group->getType()) {
+            case Type::WHALE:
+                return 2;
+            case Type::PAYER:
+                return 1;
+            case Type::DEFAULT:
+            default:
+                return 0;
+        }
+    }
+
+    public function sortGroups()
+    {
+        usort($this->groups, function(Group $groupA, Group $groupB) {
+            return self::groupToIntForSort($groupB) <=> self::groupToIntForSort($groupA);
+        });
+    }
+
     public function addMember(Member $member)
     {
         $group = $this->groups[0];
