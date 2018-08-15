@@ -2,7 +2,12 @@
 
 require "vendor/autoload.php";
 
-// docker exec -it e1b7055333f2 mongo localhost/local
+// docker exec -it leaderboards_mongo_1 mongo localhost/local
+
+use LeaderBoard\MongoStorage;
+use LeaderBoard\LeaderBoard;
+use LeaderBoard\Member;
+use LeaderBoard\Type;
 
 $config = [
     "host" => "mongo",
@@ -10,8 +15,9 @@ $config = [
     "db" => "local",
 ];
 
-$mongo = new \LeaderBoard\MongoStorage($config);
+$mongo = new MongoStorage($config);
 
-$leaderBoard = new \LeaderBoard\LeaderBoard($mongo);
-$leaderBoard->getGroupsFromStorage();
+$leaderBoard = new LeaderBoard($mongo);
+
+$leaderBoard->addMember(new Member(new Type(Type::WHALE), 1,1,0));
 //$leaderBoard->writeGroups();

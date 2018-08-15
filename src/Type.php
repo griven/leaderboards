@@ -6,12 +6,12 @@ namespace LeaderBoard;
 
 class Type
 {
-    const KIT = "kit";
+    const WHALE = "whale";
     const PAYER = "payer";
     const DEFAULT = "default";
 
     const POSSIBLE_VALUES = [
-        self::KIT,
+        self::WHALE,
         self::PAYER,
         self::DEFAULT,
     ];

@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace LeaderBoard;
 
+use MongoDB\Model\BSONArray;
+
 class MongoStorage
 {
 
@@ -59,10 +61,18 @@ class MongoStorage
 
     public function getGroups(): iterable
     {
-        $groupsData = $this->collection->find();
+        $groupsData = $this->collection->find([], [
+            'typeMap' => [
+                'root'     => 'array',
+                'document' => 'array'
+            ]
+        ]);
+
+        $data = $groupsData->toArray();
 
         $groups = [];
-        foreach ($groupsData as $groupData) {
+
+        foreach ($data as $groupData) {
             $groups[] = Group::fromArray($groupData);
         }
 

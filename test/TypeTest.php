@@ -16,7 +16,7 @@ class TypeTest extends TestCase
 
     public function testToString()
     {
-        $type = new Type(Type::KIT);
-        $this->assertEquals("kit", $type->toString());
+        $type = new Type(Type::WHALE);
+        $this->assertEquals(Type::WHALE, $type->toString());
     }
 }

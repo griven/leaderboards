@@ -4,30 +4,34 @@ declare(strict_types=1);
 namespace LeaderBoard;
 
 
-class Group
+class Group implements IArrayTransform
 {
     const MAX_SIZE = 70;
 
+    /** @var int $id */
     private $id;
 
+    /** @var Type $type */
     private $type;
 
-    private $members;
+    /** @var MembersCollection $membersCollections*/
+    private $membersCollections;
 
+    /** @var array $counts */
     private $counts;
 
-    public function __construct(int $id, Type $type, array $members = [])
+    public function __construct(int $id, Type $type, MembersCollection $membersCollection)
     {
         $this->id = $id;
 
         $this->type = $type;
         $this->setCounts();
 
-
-        $this->members = $members;
-        if (count($this->members) > self::MAX_SIZE) {
+        if ($membersCollection > self::MAX_SIZE) {
             throw new \InvalidArgumentException('too much members');
         }
+
+        $this->membersCollections = $membersCollection;
     }
 
     public function getType(): string
@@ -38,7 +42,7 @@ class Group
     private function setCounts()
     {
         switch ($this->type->toString()) {
-            case Type::KIT:
+            case Type::WHALE:
                 $kitCount = 4;
                 $payerCount = 16;
                 $defaultCount = 50;
@@ -61,7 +65,7 @@ class Group
         }
 
         $this->counts = [
-            Type::KIT => $kitCount,
+            Type::WHALE => $kitCount,
             Type::PAYER => $payerCount,
             Type::DEFAULT => $defaultCount,
         ];
@@ -72,23 +76,24 @@ class Group
         return $this->id;
     }
 
-    public function getMembers(): iterable
-    {
-        return $this->members;
-    }
-
     public function toArray(): array
     {
         return [
             "id" => $this->getId(),
             "type" => $this->getType(),
-            "members" => $this->getMembers(),
+            "members" => $this->membersCollections->toArray(),
         ];
     }
 
-    public static function fromArray($data): self
+    public static function fromArray(array $data): self
     {
         $type = new Type($data["type"]);
-        return new self($data["id"], $type, []);
+        $membersCollection = MembersCollection::fromArray($data['members']);
+        return new self($data["id"], $type, $membersCollection);
+    }
+
+    public function addMember(Member $member)
+    {
+        $this->membersCollections->addMember($member);
     }
 }

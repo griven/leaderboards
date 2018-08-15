@@ -6,32 +6,44 @@ namespace LeaderBoard;
 
 class LeaderBoard
 {
+    /** @var MongoStorage $mongo */
     private $mongo;
 
+    /** @var Group[] $groups */
     private $groups;
 
-    public function __construct(MongoStorage $mongo)
+    public function __construct(MongoStorage $mongo, iterable $groups = [])
     {
         $this->mongo = $mongo;
+
+        if (empty($groups)) {
+            $this->setGroupsFromStorage();
+        } else {
+            $this->setGroups($groups);
+        }
     }
 
-    public function setGroupsFromStorage(): iterable
+    public function setGroupsFromStorage()
     {
-        $this->groups = $this->mongo->getGroups();
+        $this->setGroups($this->mongo->getGroups());
     }
 
     public function setGroups(iterable $groups)
     {
-        $this->groups = $groups;
+        foreach ($groups as $group) {
+            if ($group instanceof Group) {
+                $this->groups[] = $group;
+            } else {
+                throw new \InvalidArgumentException("bad group Type" . json_encode($group));
+            }
+        }
     }
 
-    public function writeGroups(): bool
+    public function addMember(Member $member)
     {
-        $saved = true;
-        foreach ($this->groups as $group) {
-            $saved &= $this->mongo->saveGroup($group);
-        }
+        $group = $this->groups[0];
 
-        return $saved;
+        $group->addMember($member);
+        $this->mongo->saveGroup($group);
     }
 }

@@ -22,7 +22,7 @@
     </filter>
     <testsuites>
         <testsuite name="UnitTests">
-            <directory>./tests</directory>
+            <directory>./test</directory>
         </testsuite>
     </testsuites>
 </phpunit>
