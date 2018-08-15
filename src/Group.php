@@ -85,4 +85,10 @@ class Group
             "members" => $this->getMembers(),
         ];
     }
+
+    public static function fromArray($data): self
+    {
+        $type = new Type($data["type"]);
+        return new self($data["id"], $type, []);
+    }
 }

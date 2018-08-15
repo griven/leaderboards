@@ -6,19 +6,32 @@ namespace LeaderBoard;
 
 class LeaderBoard
 {
-    private $kitGroup;
-
     private $mongo;
+
+    private $groups;
 
     public function __construct(MongoStorage $mongo)
     {
         $this->mongo = $mongo;
     }
 
+    public function setGroupsFromStorage(): iterable
+    {
+        $this->groups = $this->mongo->getGroups();
+    }
+
+    public function setGroups(iterable $groups)
+    {
+        $this->groups = $groups;
+    }
+
     public function writeGroups(): bool
     {
-        $this->kitGroup = new Group($this->mongo->getNextGroupId(), new Type(Type::KIT));
+        $saved = true;
+        foreach ($this->groups as $group) {
+            $saved &= $this->mongo->saveGroup($group);
+        }
 
-        return $this->mongo->saveGroup($this->kitGroup);
+        return $saved;
     }
 }

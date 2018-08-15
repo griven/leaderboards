@@ -57,4 +57,16 @@ class MongoStorage
         throw new \Exception("can't find nex group id");
     }
 
+    public function getGroups(): iterable
+    {
+        $groupsData = $this->collection->find();
+
+        $groups = [];
+        foreach ($groupsData as $groupData) {
+            $groups[] = Group::fromArray($groupData);
+        }
+
+        return $groups;
+    }
+
 }

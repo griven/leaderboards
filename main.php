@@ -13,4 +13,5 @@ $config = [
 $mongo = new \LeaderBoard\MongoStorage($config);
 
 $leaderBoard = new \LeaderBoard\LeaderBoard($mongo);
-$leaderBoard->writeGroups();
+$leaderBoard->getGroupsFromStorage();
+//$leaderBoard->writeGroups();
