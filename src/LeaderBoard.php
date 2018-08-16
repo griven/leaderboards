@@ -61,7 +61,12 @@ class LeaderBoard
     public function sortGroups()
     {
         usort($this->groups, function(Group $groupA, Group $groupB) {
-            return self::groupToIntForSort($groupB) <=> self::groupToIntForSort($groupA);
+            $sortByType = self::groupToIntForSort($groupB) <=> self::groupToIntForSort($groupA);
+            if ($sortByType === 0) {
+                return $groupA->getId() <=> $groupB->getId();
+            }
+
+            return $sortByType;
         });
     }
 
