@@ -9,16 +9,11 @@ class MembersCollection implements IArrayTransform
     /** @var Member[] $members */
     private $members;
 
-    public function __construct(array $members)
+    public function __construct(array $members = [])
     {
         // валидация
         foreach ($members as $member) {
-            if ($member instanceof Member) {
-                $this->members = $members;
-            } else {
-                $msg = (gettype($member) == 'object') ? "class " . get_class($member) : "type " . gettype($member);
-                throw new \InvalidArgumentException("bad Member " . $msg);
-            }
+            $this->addMember($member);
         }
     }
 
@@ -46,8 +41,13 @@ class MembersCollection implements IArrayTransform
         return new self($members);
     }
 
-    public function addMember(Member $member)
+    public function addMember(Member $member): bool
     {
+        if (in_array($member, $this->members)) {
+            throw new LeaderBoardException("already in collection, member Id " . $member->getId());
+        }
+
         $this->members[] = $member;
+        return true;
     }
 }

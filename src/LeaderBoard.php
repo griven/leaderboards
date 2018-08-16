@@ -16,6 +16,7 @@ class LeaderBoard
     {
         $this->mongo = $mongo;
 
+        $this->groups = [];
         if (empty($groups)) {
             $this->setGroupsFromStorage();
         } else {
@@ -64,11 +65,50 @@ class LeaderBoard
         });
     }
 
-    public function addMember(Member $member)
+    /**
+     * Распределяем участника в группу
+     *
+     * @param Member $member
+     * @throws \Exception
+     */
+    public function distributeMember(Member $member)
     {
-        $group = $this->groups[0];
+        $this->sortGroups();
 
-        $group->addMember($member);
+        $group = $this->addToExistingGroup($member) ?? $this->addToNewGroup($member);
+
         $this->mongo->saveGroup($group);
+    }
+
+    /**
+     * Добавление в существующую группу
+     *
+     * @param Member $member
+     * @return Group|null
+     */
+    private function addToExistingGroup(Member $member): ?Group
+    {
+        foreach ($this->groups as $group) {
+            $isAdded = $group->addMember($member);
+            if ($isAdded) {
+                return $group;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Добавление в новую группу
+     *
+     * @param Member $member
+     * @return Group
+     * @throws \Exception
+     */
+    private function addToNewGroup(Member $member): Group
+    {
+        $group = Group::createForMember($this->mongo->getNextId("group"), $member);
+        $this->groups[] = $group;
+        return $group;
     }
 }

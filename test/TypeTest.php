@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace test;
+namespace LeaderBoard;
 
 use LeaderBoard\Type;
 use PHPUnit\Framework\TestCase;

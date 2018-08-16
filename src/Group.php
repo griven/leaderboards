@@ -92,8 +92,15 @@ class Group implements IArrayTransform
         return new self($data["id"], $type, $membersCollection);
     }
 
-    public function addMember(Member $member)
+    public function addMember(Member $member): bool
     {
-        $this->membersCollections->addMember($member);
+        return $this->membersCollections->addMember($member);
+    }
+
+    public static function createForMember(int $id, Member $member): self
+    {
+        $memberCollection = new MembersCollection([$member]);
+
+        return new self($id, $member->getType(), $memberCollection);
     }
 }

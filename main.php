@@ -19,5 +19,5 @@ $mongo = new MongoStorage($config);
 
 $leaderBoard = new LeaderBoard($mongo);
 
-$leaderBoard->addMember(new Member(new Type(Type::WHALE), 1,1,0));
+$leaderBoard->distributeMember(new Member(new Type(Type::WHALE), $mongo->getNextId("member"),1,0));
 //$leaderBoard->writeGroups();

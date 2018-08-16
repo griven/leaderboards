@@ -39,10 +39,10 @@ class MongoStorage
         return $result->isAcknowledged();
     }
 
-    public function getNextGroupId(): int
+    public function getNextId(string $collection): int
     {
         $result = $this->sequenceCollection->findOneAndUpdate(
-            ['name' => "group"],
+            ['name' => $collection],
             ['$inc' => ['value' => 1]],
             [
                 // наркомания для того, чтобы документ возвращался уже обновлённый
@@ -54,7 +54,7 @@ class MongoStorage
             return (int)$result->value;
         }
 
-        throw new \Exception("can't find nex group id");
+        throw new \Exception("can't find next id");
     }
 
     public function getGroups(): iterable

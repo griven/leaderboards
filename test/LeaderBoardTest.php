@@ -13,7 +13,7 @@ class LeaderBoardTest extends TestCase
 
     public function setUp()
     {
-        $memCollection = new MembersCollection([]);
+        $memCollection = new MembersCollection();
 
         $this->whaleGroup = new Group(1, new Type(Type::WHALE), $memCollection);
         $this->payerGroup = new Group(2, new Type(Type::PAYER), $memCollection);
@@ -34,7 +34,7 @@ class LeaderBoardTest extends TestCase
 
     public function groupToIntForSortProvider()
     {
-        $memCollection = new MembersCollection([]);
+        $memCollection = new MembersCollection();
 
         return [
             [2, new Group(1, new Type(Type::WHALE), $memCollection)],
