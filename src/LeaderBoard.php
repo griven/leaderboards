@@ -111,4 +111,15 @@ class LeaderBoard
         $this->groups[] = $group;
         return $group;
     }
+
+    public function toString()
+    {
+        $string = 'Leaderboard' . PHP_EOL;
+        foreach ($this->groups as $group) {
+            $groupArrayInfo = array_merge([$group->getId(), $group->getType()] , $group->getCount());
+            $string .= implode(" | ", $groupArrayInfo) . PHP_EOL;
+        }
+
+        return $string;
+    }
 }

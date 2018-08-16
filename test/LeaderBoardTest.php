@@ -13,11 +13,9 @@ class LeaderBoardTest extends TestCase
 
     public function setUp()
     {
-        $memCollection = new MembersCollection();
-
-        $this->whaleGroup = new Group(1, new Type(Type::WHALE), $memCollection);
-        $this->payerGroup = new Group(2, new Type(Type::PAYER), $memCollection);
-        $this->defaultGroup = new Group(3, new Type(Type::DEFAULT), $memCollection);
+        $this->whaleGroup = new Group(1, new Type(Type::WHALE));
+        $this->payerGroup = new Group(2, new Type(Type::PAYER));
+        $this->defaultGroup = new Group(3, new Type(Type::DEFAULT));
     }
 
     public function testSortGroups()
@@ -34,12 +32,10 @@ class LeaderBoardTest extends TestCase
 
     public function groupToIntForSortProvider()
     {
-        $memCollection = new MembersCollection();
-
         return [
-            [2, new Group(1, new Type(Type::WHALE), $memCollection)],
-            [1, new Group(2, new Type(Type::PAYER), $memCollection)],
-            [0, new Group(3, new Type(Type::DEFAULT), $memCollection)],
+            [2, new Group(1, new Type(Type::WHALE))],
+            [1, new Group(2, new Type(Type::PAYER))],
+            [0, new Group(3, new Type(Type::DEFAULT))],
         ];
     }
 

@@ -6,8 +6,6 @@ namespace LeaderBoard;
 
 class Group implements IArrayTransform
 {
-    const MAX_SIZE = 70;
-
     /** @var int $id */
     private $id;
 
@@ -17,58 +15,19 @@ class Group implements IArrayTransform
     /** @var MembersCollection $membersCollections*/
     private $membersCollections;
 
-    /** @var array $counts */
-    private $counts;
-
-    public function __construct(int $id, Type $type, MembersCollection $membersCollection)
+    public function __construct(int $id, Type $type, MembersCollection $membersCollection = null)
     {
         $this->id = $id;
 
         $this->type = $type;
-        $this->setCounts();
 
-        if ($membersCollection->getCount() > self::MAX_SIZE) {
-            throw new \InvalidArgumentException('too much members');
-        }
-
-        $this->membersCollections = $membersCollection;
+        $this->membersCollections = $membersCollection ?? new MembersCollection();
+        $this->membersCollections->setLimit(new MemberLimit($this->type));
     }
 
     public function getType(): string
     {
         return $this->type->toString();
-    }
-
-    private function setCounts()
-    {
-        switch ($this->type->toString()) {
-            case Type::WHALE:
-                $kitCount = 4;
-                $payerCount = 16;
-                $defaultCount = 50;
-                break;
-            case Type::PAYER:
-                $kitCount = 0;
-                $payerCount = 20;
-                $defaultCount = 50;
-                break;
-            case Type::DEFAULT:
-            default:
-                $kitCount = 0;
-                $payerCount = 0;
-                $defaultCount = 70;
-                break;
-        }
-
-        if ( ($kitCount + $payerCount + $defaultCount) != self::MAX_SIZE) {
-            throw new \Exception("bad max size");
-        }
-
-        $this->counts = [
-            Type::WHALE => $kitCount,
-            Type::PAYER => $payerCount,
-            Type::DEFAULT => $defaultCount,
-        ];
     }
 
     public function getId(): int
@@ -89,6 +48,7 @@ class Group implements IArrayTransform
     {
         $type = new Type($data["type"]);
         $membersCollection = MembersCollection::fromArray($data['members']);
+        $membersCollection->setLimit(new MemberLimit($type));
         return new self($data["id"], $type, $membersCollection);
     }
 
@@ -102,5 +62,19 @@ class Group implements IArrayTransform
         $memberCollection = new MembersCollection([$member]);
 
         return new self($id, $member->getType(), $memberCollection);
+    }
+
+    /**
+     * Только для отладки
+     * @return array
+     */
+    public function getCount(): array
+    {
+        return [
+            $this->membersCollections->getCount(),
+            $this->membersCollections->getCountByType(new Type(Type::WHALE)),
+            $this->membersCollections->getCountByType(new Type(Type::PAYER)),
+            $this->membersCollections->getCountByType(new Type(Type::DEFAULT)),
+        ];
     }
 }

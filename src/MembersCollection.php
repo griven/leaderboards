@@ -9,9 +9,13 @@ class MembersCollection implements IArrayTransform
     /** @var Member[] $members */
     private $members;
 
+    /** @var MemberLimit $limit */
+    private $limit;
+
     public function __construct(array $members = [])
     {
         // валидация
+        $this->members = [];
         foreach ($members as $member) {
             $this->addMember($member);
         }
@@ -47,7 +51,34 @@ class MembersCollection implements IArrayTransform
             throw new LeaderBoardException("already in collection, member Id " . $member->getId());
         }
 
+        if ($this->limit) {
+            $limit = $this->limit->getLimitByType($member->getType());
+            $count = $this->getCountByType($member->getType());
+
+            // уже некуда добавлять
+            if ($count >= $limit) {
+                return false;
+            }
+        }
+
         $this->members[] = $member;
         return true;
+    }
+
+    public function setLimit(MemberLimit $limit)
+    {
+        $this->limit = $limit;
+    }
+
+    public function getCountByType(Type $type): int
+    {
+        $count = 0;
+        foreach ($this->members as $member) {
+            if ($member->getType()->equals($type)) {
+                $count++;
+            }
+        }
+
+        return $count;
     }
 }

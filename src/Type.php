@@ -31,4 +31,9 @@ class Type
     {
         return $this->type;
     }
+
+    public function equals(Type $type): bool
+    {
+        return $this->toString() === $type->toString();
+    }
 }
