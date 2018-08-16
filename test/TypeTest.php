@@ -19,4 +19,14 @@ class TypeTest extends TestCase
         $type = new Type(Type::WHALE);
         $this->assertEquals(Type::WHALE, $type->toString());
     }
+
+    public function testEquals()
+    {
+        $type = new Type(Type::WHALE);
+        $type2 = new Type(Type::WHALE);
+        $type3 = new Type(Type::DEFAULT);
+
+        $this->assertTrue($type->equals($type2));
+        $this->assertFalse($type->equals($type3));
+    }
 }

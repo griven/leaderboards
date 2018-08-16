@@ -41,6 +41,7 @@ class Group implements IArrayTransform
             "id" => $this->getId(),
             "type" => $this->getType(),
             "members" => $this->membersCollections->toArray(),
+            "isFull" => $this->membersCollections->isFull(),
         ];
     }
 
@@ -75,6 +76,7 @@ class Group implements IArrayTransform
             $this->membersCollections->getCountByType(new Type(Type::WHALE)),
             $this->membersCollections->getCountByType(new Type(Type::PAYER)),
             $this->membersCollections->getCountByType(new Type(Type::DEFAULT)),
+            $this->membersCollections->isFull() ? "+" : '-',
         ];
     }
 }

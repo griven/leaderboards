@@ -30,9 +30,9 @@ $types = [
 for($i=0;$i<1000;$i++) {
 
     $percent = rand(0,100);
-    if ($percent<5) {
+    if ($percent<2) {
         $type = $types[0];
-    } elseif ($percent<30) {
+    } elseif ($percent<10) {
         $type = $types[1];
     } else {
         $type = $types[2];
@@ -46,3 +46,9 @@ for($i=0;$i<1000;$i++) {
 }
 
 echo $leaderBoard->toString();
+
+echo PHP_EOL . "ALL GROUPS" . PHP_EOL;
+
+$lb2 = new LeaderBoard($mongo, $mongo->getGroups());
+$lb2->sortGroups();
+echo $lb2->toString();

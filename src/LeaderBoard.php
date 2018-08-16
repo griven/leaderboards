@@ -26,7 +26,7 @@ class LeaderBoard
 
     public function setGroupsFromStorage()
     {
-        $this->setGroups($this->mongo->getGroups());
+        $this->setGroups($this->mongo->getGroups(false));
     }
 
     public function setGroups(iterable $groups)

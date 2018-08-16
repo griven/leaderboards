@@ -45,6 +45,13 @@ class MembersCollection implements IArrayTransform
         return new self($members);
     }
 
+    /**
+     * Добавление участника
+     *
+     * @param Member $member
+     * @return bool - true(добавили), false(нет места)
+     * @throws LeaderBoardException
+     */
     public function addMember(Member $member): bool
     {
         if (in_array($member, $this->members)) {
@@ -80,5 +87,10 @@ class MembersCollection implements IArrayTransform
         }
 
         return $count;
+    }
+
+    public function isFull()
+    {
+        return $this->getCount() >= MemberLimit::TOTAL_LIMIT;
     }
 }

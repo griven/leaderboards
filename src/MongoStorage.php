@@ -57,9 +57,11 @@ class MongoStorage
         throw new \Exception("can't find next id");
     }
 
-    public function getGroups(): iterable
+    public function getGroups(bool $isFull = null): iterable
     {
-        $groupsData = $this->collection->find([], [
+        $query = is_null($isFull) ? [] : ["isFull" => $isFull];
+
+        $groupsData = $this->collection->find($query, [
             'typeMap' => [
                 'root'     => 'array',
                 'document' => 'array'
