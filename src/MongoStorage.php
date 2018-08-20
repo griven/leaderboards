@@ -71,10 +71,26 @@ class MongoStorage
         $groups = [];
 
         foreach ($data as $groupData) {
+            $groupData["members"] = MembersCollection::fromArray($this->findMembers($groupData["id"]));
             $groups[] = Group::fromArray($groupData);
         }
 
         return $groups;
+    }
+
+    private function findMembers(int $groupId): array
+    {
+        $cursor = $this->playersCollection->find(
+            ["group_id" => $groupId],
+            [
+                'typeMap' => [
+                    'root'     => 'array',
+                    'document' => 'array'
+                ]
+            ]
+        );
+
+        return $cursor->toArray();
     }
 
     public function addMemberToGroup(Member $member, Group $group): bool
@@ -100,6 +116,17 @@ class MongoStorage
 
         $canInsert = $result["count"][$typeCount] <= $group->getLimit($member->getType());
         if (!$canInsert) {
+            $totalCount = 0;
+            foreach ($result["count"] as $counts) {
+                $totalCount += $counts;
+            }
+            if ($totalCount >= MemberLimit::TOTAL_LIMIT) {
+                $this->groupsCollection->updateOne(
+                    ["id" => $group->getId()],
+                    ['$set' => ["isFull" => true]]
+                );
+            }
+
             return false;
         }
 

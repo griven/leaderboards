@@ -55,7 +55,7 @@ class Group implements IArrayTransform
     public static function fromArray(array $data): self
     {
         $type = new Type($data["type"]);
-        return new self($data["id"], $type);
+        return new self($data["id"], $type, $data["members"]);
     }
 
     public function addMember(Member $member): bool

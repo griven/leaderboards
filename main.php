@@ -27,7 +27,7 @@ $types = [
     new Type(Type::DEFAULT)
 ];
 
-for($i=0;$i<1;$i++) {
+for($i=0;$i<1000;$i++) {
 
     $percent = rand(0,100);
     if ($percent<2) {
