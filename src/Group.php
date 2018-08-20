@@ -15,6 +15,9 @@ class Group implements IArrayTransform
     /** @var MembersCollection $membersCollections*/
     private $membersCollections;
 
+    /** @var MemberLimit $limit */
+    private $limit;
+
     public function __construct(int $id, Type $type, MembersCollection $membersCollection = null)
     {
         $this->id = $id;
@@ -22,7 +25,7 @@ class Group implements IArrayTransform
         $this->type = $type;
 
         $this->membersCollections = $membersCollection ?? new MembersCollection();
-        $this->membersCollections->setLimit(new MemberLimit($this->type));
+        $this->limit = new MemberLimit($this->type);
     }
 
     public function getType(): string
@@ -40,17 +43,19 @@ class Group implements IArrayTransform
         return [
             "id" => $this->getId(),
             "type" => $this->getType(),
-            "members" => $this->membersCollections->toArray(),
-            "isFull" => $this->membersCollections->isFull(),
+            "isFull" => false,
+            "count" => [
+                "whale" => 0,
+                "payer" => 0,
+                "default" => 0,
+            ],
         ];
     }
 
     public static function fromArray(array $data): self
     {
         $type = new Type($data["type"]);
-        $membersCollection = MembersCollection::fromArray($data['members']);
-        $membersCollection->setLimit(new MemberLimit($type));
-        return new self($data["id"], $type, $membersCollection);
+        return new self($data["id"], $type);
     }
 
     public function addMember(Member $member): bool
@@ -61,8 +66,12 @@ class Group implements IArrayTransform
     public static function createForMember(int $id, Member $member): self
     {
         $memberCollection = new MembersCollection([$member]);
-
         return new self($id, $member->getType(), $memberCollection);
+    }
+
+    public function getLimit(Type $type)
+    {
+        return $this->limit->getLimitByType($type);
     }
 
     /**

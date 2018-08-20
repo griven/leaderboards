@@ -3,38 +3,36 @@ declare(strict_types=1);
 
 namespace LeaderBoard;
 
+use MongoDB\Model\BSONDocument;
+
 class MongoStorage
 {
 
-    const COLLECTION_NAME = "leaderboard";
+    const COLLECTION_PLAYERS = "leaderboard_players";
+    const COLLECTION_GROUPS = "leaderboard_groups";
     const SEQUENCE_NAME = "sequence";
 
-    private $collection;
+    /** @var \MongoDB\Collection  */
+    private $playersCollection;
 
+    /** @var \MongoDB\Collection  */
+    private $groupsCollection;
+
+    /** @var \MongoDB\Collection  */
     private $sequenceCollection;
 
     public function __construct(array $config = null)
     {
         $mongo = (new \MongoDB\Client('mongodb://' . $config['host'] . ':' . $config['port']));
 
-        $this->collection = $mongo->selectDatabase($config['db'])->selectCollection(self::COLLECTION_NAME);
+        $this->playersCollection = $mongo->selectDatabase($config['db'])->selectCollection(self::COLLECTION_PLAYERS);
+        $this->groupsCollection = $mongo->selectDatabase($config['db'])->selectCollection(self::COLLECTION_GROUPS);
         $this->sequenceCollection = $mongo->selectDatabase($config['db'])->selectCollection(self::SEQUENCE_NAME);
     }
 
-    public function tryWrite(): bool
+    public function insertGroup(Group $group): bool
     {
-        $insertOneResult = $this->collection->insertOne([
-            'username' => 'admin',
-            'email' => 'admin@example.com',
-            'name' => 'Admin User',
-        ]);
-
-        return $insertOneResult->isAcknowledged();
-    }
-
-    public function saveGroup(Group $group): bool
-    {
-        $result = $this->collection->updateOne(['id' => $group->getId()], ['$set' => $group->toArray()], ['upsert' => true]);
+        $result = $this->groupsCollection->insertOne($group->toArray());
 
         return $result->isAcknowledged();
     }
@@ -61,7 +59,7 @@ class MongoStorage
     {
         $query = is_null($isFull) ? [] : ["isFull" => $isFull];
 
-        $groupsData = $this->collection->find($query, [
+        $groupsData = $this->groupsCollection->find($query, [
             'typeMap' => [
                 'root'     => 'array',
                 'document' => 'array'
@@ -79,4 +77,34 @@ class MongoStorage
         return $groups;
     }
 
+    public function addMemberToGroup(Member $member, Group $group): bool
+    {
+        // проверяем есть ли место в группе
+
+        $typeCount = $member->getType()->toString();
+
+        /** @var BSONDocument $result */
+        $result = $this->groupsCollection->findOneAndUpdate(
+            ["id" => $group->getId()],
+            ['$inc' => ["count.$typeCount" => 1]],
+            [
+                // наркомания для того, чтобы документ возвращался уже обновлённый
+                'returnDocument' => 2,
+                'upsert' => true,
+                'typeMap' => [
+                    'root'     => 'array',
+                    'document' => 'array'
+                ],
+            ]
+        );
+
+        $canInsert = $result["count"][$typeCount] <= $group->getLimit($member->getType());
+        if (!$canInsert) {
+            return false;
+        }
+
+        // добавляем в группу
+        $memberData = array_merge(["group_id" => $group->getId()], $member->toArray());
+        return $this->playersCollection->insertOne($memberData)->isAcknowledged();
+    }
 }

@@ -76,45 +76,44 @@ class LeaderBoard
      * @param Member $member
      * @throws \Exception
      */
-    public function distributeMember(Member $member)
+    public function distributeMember(Member $member): void
     {
-        $this->sortGroups();
-
-        $group = $this->addToExistingGroup($member) ?? $this->addToNewGroup($member);
-
-        $this->mongo->saveGroup($group);
+        $this->addToExistingGroup($member) ?: $this->addToNewGroup($member);
     }
 
     /**
      * Добавление в существующую группу
      *
      * @param Member $member
-     * @return Group|null
+     * @return bool
      */
-    private function addToExistingGroup(Member $member): ?Group
+    private function addToExistingGroup(Member $member): bool
     {
+        $this->sortGroups();
         foreach ($this->groups as $group) {
-            $isAdded = $group->addMember($member);
+            $isAdded = $this->mongo->addMemberToGroup($member, $group);
             if ($isAdded) {
-                return $group;
+                $group->addMember($member);
+                return true;
             }
         }
 
-        return null;
+        return false;
     }
 
     /**
      * Добавление в новую группу
      *
      * @param Member $member
-     * @return Group
+     * @return void
      * @throws \Exception
      */
-    private function addToNewGroup(Member $member): Group
+    private function addToNewGroup(Member $member): void
     {
         $group = Group::createForMember($this->mongo->getNextId("group"), $member);
+        $this->mongo->insertGroup($group);
+        $this->mongo->addMemberToGroup($member, $group);
         $this->groups[] = $group;
-        return $group;
     }
 
     public function toString()
